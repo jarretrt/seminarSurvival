@@ -7,7 +7,7 @@ session_id <- as.numeric(Sys.time())
 
 attendance = 0
 time.stamp = ymd_hms(Sys.time())
-time = minute(time.stamp) + second(time.stamp)/60
+time = hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600
 start.time = paste0(hour(time.stamp),":",minute(time.stamp))
 
 shinyServer(
@@ -26,7 +26,7 @@ shinyServer(
       attendance <<- c(attendance, tail(attendance,1)+1)
       
       time.stamp <<- ymd_hms(Sys.time())
-      time <<- c(time, minute(time.stamp) + second(time.stamp)/60)
+      time <<- c(time, hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600)
       
       in.time <- hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600
       
@@ -56,7 +56,7 @@ shinyServer(
       
       time.stamp <<- ymd_hms(Sys.time())
       
-      time <<- c(time, minute(time.stamp) + second(time.stamp)/60)
+      time <<- c(time, hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600)
       
       out.time <- (hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600)
       
@@ -86,8 +86,8 @@ shinyServer(
       invalidateLater(2000)
       attendance <<- c(attendance, tail(attendance,1))
       time.stamp <<- ymd_hms(Sys.time())
-      time <<- c(time, minute(time.stamp) + second(time.stamp)/60)
-      plot(time, attendance, type = "s", xlim = c(min(time), max(time)+1))
+      time <<- c(time, hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600)
+      plot(time, attendance, type = "s", xlim = c(min(time), max(time)+1/60))
       max.participants <- max(attendance)
       current.participants <- tail(attendance,1)
       current.pct <- round((current.participants / max.participants)*100)
