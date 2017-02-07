@@ -42,7 +42,7 @@ shinyServer(
       colnames(tab) <- " "
       tab <<- tab
       output$tab <- renderTable(tab)
-      output$tab.full <- renderTable(rv$tab.full)
+      output$tab.full <- renderTable(rv$tab.full[min(which(rv$tab.full$surv_id ==1)):nrow(rv$tab.full),])
       
     })
     
@@ -77,7 +77,7 @@ shinyServer(
       colnames(tab) <- " "
       tab <<- tab
       output$tab <- renderTable(tab)
-      output$tab.full <- renderTable(rv$tab.full)
+      output$tab.full <- renderTable(rv$tab.full[min(which(rv$tab.full$surv_id ==1)):nrow(rv$tab.full),])
     })
     
   
