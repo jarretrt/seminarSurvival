@@ -26,6 +26,7 @@ shinyUI(
                 # alternates: "Boring conversation anyway."
                 # uiOutput("count"),
                 tableOutput('tab'),
+                tableOutput('tab.full'),
                 plotOutput("timePlot")
                 )
             )

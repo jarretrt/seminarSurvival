@@ -2,6 +2,9 @@ library(shiny)
 library(shinythemes)
 library(lubridate)
 
+#add session_id
+session_id <- as.numeric(Sys.time())
+
 attendance = 0
 time.stamp = ymd_hms(Sys.time())
 time = minute(time.stamp) + second(time.stamp)/60
@@ -9,22 +12,39 @@ start.time = paste0(hour(time.stamp),":",minute(time.stamp))
 
 shinyServer(
   function(input, output, session) {
-    
+    rv <- reactiveValues(
+      surv_id = 0,
+      tab.full = data.frame(session_id   = session_id,
+                            surv_id = 0,
+                            comb_id = paste0(session_id, 0),
+                            time   = time,
+                            awake    = 0)
+    )
     observeEvent(input$increment, {
+      
+      rv$surv_id <<- rv$surv_id + 1
       attendance <<- c(attendance, tail(attendance,1)+1)
       
       time.stamp <<- ymd_hms(Sys.time())
       time <<- c(time, minute(time.stamp) + second(time.stamp)/60)
       
+      in.time <- hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600
+      
       max.participants <- max(attendance)
       current.participants <- tail(attendance,1)
       current.pct <- round((current.participants / max.participants)*100)
       first.dropout <- ifelse(sum(diff(attendance) < 1) >0 , time[min(which(diff(attendance) < 0))], 0)
+      
+      personal.tab <- data.frame(session_id = session_id, surv_id = isolate(rv$surv_id), comb_id = paste0(session_id, isolate(rv$surv_id)), time = in.time, awake = 1)
+      rv$tab.full <<- rbind(rv$tab.full, personal.tab)
+      
       tab <- data.frame(rbind(max.participants,current.participants,current.pct,first.dropout),
                         row.names = c("Maximum N","Current N", "Current percent", "Time of first dropout"))
       colnames(tab) <- " "
       tab <<- tab
       output$tab <- renderTable(tab)
+      output$tab.full <- renderTable(rv$tab.full)
+      
     })
     
     observeEvent(input$decrement, {
@@ -35,7 +55,10 @@ shinyServer(
       })
       
       time.stamp <<- ymd_hms(Sys.time())
+      
       time <<- c(time, minute(time.stamp) + second(time.stamp)/60)
+      
+      out.time <- (hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600)
       
       # output$timePlot <- renderPlot({
       #   invalidateLater(2000, session)
@@ -46,11 +69,16 @@ shinyServer(
       current.participants <- tail(attendance,1)
       current.pct <- round((current.participants / max.participants)*100)
       first.dropout <- ifelse(sum(diff(attendance) < 1) >0 , time[min(which(diff(attendance) < 0))], 0)
+      
+      personal.tab <- data.frame(session_id = session_id, surv_id = isolate(rv$surv_id), comb_id = paste0(session_id, isolate(rv$surv_id)), time = out.time, awake = 0)
+      rv$tab.full <<- rbind(rv$tab.full, personal.tab)
+      
       tab <- data.frame(rbind(max.participants,current.participants,current.pct,first.dropout),
                         row.names = c("Maximum N","Current N", "Current percent", "Time of first dropout"))
       colnames(tab) <- " "
       tab <<- tab
       output$tab <- renderTable(tab)
+      output$tab.full <- renderTable(rv$tab.full)
     })
     
   
