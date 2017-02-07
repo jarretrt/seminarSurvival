@@ -2,9 +2,6 @@ library(shiny)
 library(shinythemes)
 library(lubridate)
 
-#add session_id
-session_id <- as.numeric(Sys.time())
-
 attendance = 0
 time.stamp = ymd_hms(Sys.time())
 time = hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600
@@ -12,6 +9,8 @@ start.time = paste0(hour(time.stamp),":",minute(time.stamp))
 
 shinyServer(
   function(input, output, session) {
+    #add session_id
+    session_id <- as.numeric(Sys.time())
     rv <- reactiveValues(
       surv_id = 0,
       tab.full = data.frame(session_id   = session_id,
