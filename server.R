@@ -7,6 +7,12 @@ time.stamp = ymd_hms(Sys.time())
 time = hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600
 start.time = paste0(hour(time.stamp),":",minute(time.stamp))
 
+tab.everyone = data.frame(session_id   = NULL,
+                      surv_id = NULL,
+                      comb_id = NULL,
+                      time   = NULL,
+                      awake    = NULL)
+
 shinyServer(
   function(input, output, session) {
     #add session_id
@@ -36,6 +42,7 @@ shinyServer(
       
       personal.tab <- data.frame(session_id = session_id, surv_id = isolate(rv$surv_id), comb_id = paste0(session_id, isolate(rv$surv_id)), time = in.time, awake = 1)
       rv$tab.full <<- rbind(rv$tab.full, personal.tab)
+      tab.everyone <<- rbind(tab.everyone, rv$tab.full)
       
       tab <- data.frame(rbind(max.participants,current.participants,current.pct,first.dropout),
                         row.names = c("Maximum N","Current N", "Current percent", "Time of first dropout"))
@@ -59,11 +66,6 @@ shinyServer(
       
       out.time <- (hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600)
       
-      # output$timePlot <- renderPlot({
-      #   invalidateLater(2000, session)
-      #   plot(time, attendance, type = "s", xlim = c(min(time), max(time)+1))
-      # })
-      
       max.participants <- max(attendance)
       current.participants <- tail(attendance,1)
       current.pct <- round((current.participants / max.participants)*100)
@@ -71,6 +73,7 @@ shinyServer(
       
       personal.tab <- data.frame(session_id = session_id, surv_id = isolate(rv$surv_id), comb_id = paste0(session_id, isolate(rv$surv_id)), time = out.time, awake = 0)
       rv$tab.full <<- rbind(rv$tab.full, personal.tab)
+      tab.everyone <<- rbind(tab.everyone, rv$tab.full)
       
       tab <- data.frame(rbind(max.participants,current.participants,current.pct,first.dropout),
                         row.names = c("Maximum N","Current N", "Current percent", "Time of first dropout"))
@@ -98,9 +101,16 @@ shinyServer(
       output$tab <- renderTable(tab)
       
     })
-    
-
-    
+  
+    output$downloadData <- downloadHandler(
+      filename = function() { 
+        # paste(input$dataset, '.csv', sep='')
+        paste0("seminarInfo_", Sys.Date(), ".csv")
+      },
+      content = function(file) {
+        write.csv(tab.everyone, file)
+      }
+    )
     
   }
 )
