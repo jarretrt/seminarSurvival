@@ -1,0 +1,11 @@
+name: seminarSurvival
+title:
+account: ryan-j-apps
+server: shinyapps.io
+appId: 154449
+bundleId: 698799
+url: https://ryan-j-apps.shinyapps.io/seminarSurvival/
+when: 1486064077.35185
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: seminarSurvival.R
