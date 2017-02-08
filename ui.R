@@ -28,8 +28,8 @@ shinyUI(
                 # uiOutput("count"),
                 tableOutput('tab'),
                 plotOutput("timePlot"),
+                plotOutput("kmPlot"),
                 tableOutput('tab.full')
-                # tableOutput('tab.everyone')
                 )
             )
   )
