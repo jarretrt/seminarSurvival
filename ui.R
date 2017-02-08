@@ -11,7 +11,7 @@ start.time = paste0(hour(time.stamp),":",minute(time.stamp))
 
 shinyUI(
   
-  fluidPage(theme = shinytheme("flatly"),
+  fluidPage(theme = shinytheme("spacelab"),
             # h1("Seminar Survival!"),
             
             sidebarLayout(
