@@ -10,6 +10,7 @@ start.time = paste0(hour(time.stamp),":",minute(time.stamp))
 tab.everyone = data.frame(session_id   = NULL,
                       surv_id = NULL,
                       comb_id = NULL,
+                      user_id = NULL,
                       time   = NULL,
                       awake    = NULL)
 
@@ -17,16 +18,17 @@ shinyServer(
   function(input, output, session) {
     #add session_id
     session_id <- as.numeric(Sys.time())
+    
     rv <- reactiveValues(
       surv_id = 0,
       tab.full = data.frame(session_id   = session_id,
                             surv_id = 0,
                             comb_id = paste0(session_id, 0),
+                            user_id = "testid",
                             time   = time,
                             awake    = 0)
     )
     observeEvent(input$increment, {
-      
       rv$surv_id <<- rv$surv_id + 1
       attendance <<- c(attendance, tail(attendance,1)+1)
       
@@ -41,7 +43,7 @@ shinyServer(
       if(!(length(which(diff(attendance)<0))==0)){
       first.dropout <- ifelse(sum(diff(attendance) < 1) >0 , time[min(which(diff(attendance) < 0))], 0)
       } else first.dropout <- NA
-      personal.tab <- data.frame(session_id = session_id, surv_id = isolate(rv$surv_id), comb_id = paste0(session_id, isolate(rv$surv_id)), time = in.time, awake = 1)
+      personal.tab <- data.frame(session_id = session_id, surv_id = isolate(rv$surv_id), comb_id = paste0(session_id, isolate(rv$surv_id)), user_id = input$user_id, time = in.time, awake = 1)
       rv$tab.full <<- rbind(rv$tab.full, personal.tab)
       tab.everyone <<- rbind(tab.everyone, rv$tab.full)
       
@@ -50,7 +52,7 @@ shinyServer(
       colnames(tab) <- " "
       tab <<- tab
       output$tab <- renderTable(tab)
-      output$tab.full <- renderTable(rv$tab.full[min(which(rv$tab.full$surv_id ==1)):nrow(rv$tab.full),])
+      output$tab.full <- renderTable(rv$tab.full[min(which(rv$tab.full$surv_id ==1)):nrow(rv$tab.full),4:6])
       
     })
     
@@ -72,7 +74,7 @@ shinyServer(
       current.pct <- round((current.participants / max.participants)*100)
       first.dropout <- ifelse(sum(diff(attendance) < 1) >0 , time[min(which(diff(attendance) < 0))], 0)
       
-      personal.tab <- data.frame(session_id = session_id, surv_id = isolate(rv$surv_id), comb_id = paste0(session_id, isolate(rv$surv_id)), time = out.time, awake = 0)
+      personal.tab <- data.frame(session_id = session_id, surv_id = isolate(rv$surv_id), comb_id = paste0(session_id, isolate(rv$surv_id)), user_id =input$user_id, time = out.time, awake = 0)
       rv$tab.full <<- rbind(rv$tab.full, personal.tab)
       tab.everyone <<- rbind(tab.everyone, rv$tab.full)
       
@@ -81,7 +83,7 @@ shinyServer(
       colnames(tab) <- " "
       tab <<- tab
       output$tab <- renderTable(tab)
-      output$tab.full <- renderTable(rv$tab.full[min(which(rv$tab.full$surv_id ==1)):nrow(rv$tab.full),])
+      output$tab.full <- renderTable(rv$tab.full[min(which(rv$tab.full$surv_id ==1)):nrow(rv$tab.full),4:6])
     })
     
   

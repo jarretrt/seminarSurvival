@@ -18,9 +18,15 @@ shinyUI(
               
               sidebarPanel(
                 p("Start time:", start.time),
+                textInput("user_id", "User ID", "Enter a unique ID"),
                 tags$p(actionButton("increment", "Put me in coach!")),
                 tags$p(actionButton("decrement", "Not all who wander are lost... But I sure am!")),
-                downloadButton('downloadData', 'Download')
+                downloadButton('downloadData', 'Download'),
+                h5("Instructions:"),
+                p("1. Enter a unique user name"),
+                p("2. When you begin understanding the seminar, press 'Put me in coach!'"),
+                p("3. When you get lost, press 'Not all who wander are lost'"),
+                p("4. If you begin understanding again, jump back in...Repeat!")
               ),
               
               mainPanel(
