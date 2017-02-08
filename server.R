@@ -38,8 +38,9 @@ shinyServer(
       max.participants <- max(attendance)
       current.participants <- tail(attendance,1)
       current.pct <- round((current.participants / max.participants)*100)
+      if(!(length(which(diff(attendance)<0))==0)){
       first.dropout <- ifelse(sum(diff(attendance) < 1) >0 , time[min(which(diff(attendance) < 0))], 0)
-      
+      } else first.dropout <- NA
       personal.tab <- data.frame(session_id = session_id, surv_id = isolate(rv$surv_id), comb_id = paste0(session_id, isolate(rv$surv_id)), time = in.time, awake = 1)
       rv$tab.full <<- rbind(rv$tab.full, personal.tab)
       tab.everyone <<- rbind(tab.everyone, rv$tab.full)
@@ -93,7 +94,9 @@ shinyServer(
       max.participants <- max(attendance)
       current.participants <- tail(attendance,1)
       current.pct <- round((current.participants / max.participants)*100)
+      if(!(length(which(diff(attendance)<0))==0)){
       first.dropout <- ifelse(sum(diff(attendance) < 1) >0 , time[min(which(diff(attendance) < 0))], 0)
+      } else first.dropout <- NA
       tab <- data.frame(rbind(max.participants,current.participants,current.pct,first.dropout), 
                         row.names = c("Maximum N","Current N", "Current percent", "Time of first dropout"))
       colnames(tab) <- " "
@@ -108,6 +111,7 @@ shinyServer(
         paste0("seminarInfo_", Sys.Date(), ".csv")
       },
       content = function(file) {
+        tab.everyone <-tab.everyone[!duplicated(tab.everyone[,c(1,2,3,5)]),]
         write.csv(tab.everyone, file)
       }
     )
