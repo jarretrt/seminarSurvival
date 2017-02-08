@@ -11,6 +11,7 @@ start.time = paste0(hour(time.stamp),":",minute(time.stamp))
 tab.everyone = data.frame(session_id   = NULL,
                           surv_id = NULL,
                           comb_id = NULL,
+                          user_id = NULL,
                           time   = NULL,
                           awake    = NULL)
 
@@ -23,6 +24,7 @@ shinyServer(
       tab.full = data.frame(session_id   = session_id,
                             surv_id = 0,
                             comb_id = paste0(session_id, 0),
+                            user_id = 0,
                             time   = time,
                             awake    = 0)
     )
@@ -44,6 +46,7 @@ shinyServer(
       personal.tab <- data.frame(session_id = session_id, 
                                  surv_id = isolate(rv$surv_id), 
                                  comb_id = paste0(session_id, isolate(rv$surv_id)), 
+                                 user_id = input$user_id, 
                                  time = in.time, 
                                  awake = 1)
       
@@ -55,8 +58,8 @@ shinyServer(
                         row.names = c("Maximum N","Current N", "Current percent", "Time of first dropout"))
       colnames(tab) <- " "
       tab <<- tab
-      output$tab <- renderTable(tab)
-      output$tab.full <- renderTable(rv$tab.full[min(which(rv$tab.full$surv_id ==1)):nrow(rv$tab.full),])
+      output$tab <- renderTable(tab, rownames = T)
+      output$tab.full <- renderTable(rv$tab.full[min(which(rv$tab.full$surv_id ==1)):nrow(rv$tab.full),4:6])
       
     })
     
@@ -80,11 +83,14 @@ shinyServer(
         first.dropout <- ifelse(sum(diff(attendance) < 1) >0 , time[min(which(diff(attendance) < 0))], 0)
       } else first.dropout <- NA  
       
+      
       personal.tab <- data.frame(session_id = session_id, 
                                  surv_id = isolate(rv$surv_id), 
                                  comb_id = paste0(session_id, isolate(rv$surv_id)), 
+                                 user_id =input$user_id, 
                                  time = out.time, 
                                  awake = 0)
+      
       
       rv$tab.full <<- rbind(rv$tab.full, personal.tab)
       tab.everyone <<- rbind(tab.everyone, personal.tab)
@@ -94,8 +100,8 @@ shinyServer(
                         row.names = c("Maximum N","Current N", "Current percent", "Time of first dropout"))
       colnames(tab) <- " "
       tab <<- tab
-      output$tab <- renderTable(tab)
-      output$tab.full <- renderTable(rv$tab.full[min(which(rv$tab.full$surv_id ==1)):nrow(rv$tab.full),])
+      output$tab <- renderTable(tab, rownames = T)
+      output$tab.full <- renderTable(rv$tab.full[min(which(rv$tab.full$surv_id ==1)):nrow(rv$tab.full),4:6])
     })
     
   
@@ -104,7 +110,7 @@ shinyServer(
       attendance <<- c(attendance, tail(attendance,1))
       time.stamp <<- ymd_hms(Sys.time())
       time <<- c(time, hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600)
-      plot(time, attendance, type = "s", xlim = c(min(time), max(time)+1/120))
+      plot(time, attendance, type = "s", xlim = c(min(time), max(time)+1/120), xlab = "hour (24)", ylab = "cognitive attendance")
       max.participants <- max(attendance)
       current.participants <- tail(attendance,1)
       current.pct <- round((current.participants / max.participants)*100)
@@ -116,7 +122,7 @@ shinyServer(
                         row.names = c("Maximum N","Current N", "Current percent", "Time of first dropout"))
       colnames(tab) <- " "
       tab <<- tab
-      output$tab <- renderTable(tab)
+      output$tab <- renderTable(tab, rownames = T)
       
     })
   
@@ -150,6 +156,7 @@ shinyServer(
       })
       })
     
+    # output$value <- renderText({ input$caption })
     
     # tab.everyone <- read.csv("~/Desktop/seminarInfo_2017-02-07.csv")
     
