@@ -10,12 +10,13 @@ time = hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600
 start.time = paste0(hour(time.stamp),":",minute(time.stamp))
 
 shinyUI(
-  
-  fluidPage(theme = shinytheme("spacelab"),
+  navbarPage(title = "Seminar Survival", theme = shinytheme("spacelab"),
+    tabPanel("Track Survival",
+  fluidPage(
             # h1("Seminar Survival!"),
-            
+
             sidebarLayout(
-              
+
               sidebarPanel(
                 p("Start time:", start.time),
                 textInput("user_id", "User ID", "Enter a unique ID"),
@@ -28,7 +29,7 @@ shinyUI(
                 p("3. When you get lost, press 'Not all who wander are lost'"),
                 p("4. If you begin understanding again, jump back in...Repeat!")
               ),
-              
+
               mainPanel(
                 # alternates: "Boring conversation anyway."
                 # uiOutput("count"),
@@ -41,5 +42,9 @@ shinyUI(
                 )
             )
   )
-  
+    ),
+  tabPanel("About",
+           includeMarkdown("./about.md")
+           )
+  )
 )
