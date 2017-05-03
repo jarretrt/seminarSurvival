@@ -1,6 +1,6 @@
 # ui.R
 library(shiny)
-
+library(shinydashboard)
 library(shinythemes)
 library(lubridate)
 
@@ -44,7 +44,7 @@ shinyUI(
   )
     ),
   tabPanel("About",
-           includeMarkdown("./about.md")
+           includeHTML("./about.html")
            )
   )
 )
