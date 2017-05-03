@@ -1,6 +1,7 @@
 library(shiny)
 library(shinythemes)
 library(lubridate)
+library(survival)
 
 attendance = 0
 time.stamp = ymd_hms(Sys.time())
@@ -8,11 +9,19 @@ time = hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600
 start.time = paste0(hour(time.stamp),":",minute(time.stamp))
 
 tab.everyone = data.frame(session_id   = NULL,
+<<<<<<< HEAD
                       surv_id = NULL,
                       comb_id = NULL,
                       user_id = NULL,
                       time   = NULL,
                       awake    = NULL)
+=======
+                          surv_id = NULL,
+                          comb_id = NULL,
+                          user_id = NULL,
+                          time   = NULL,
+                          awake    = NULL)
+>>>>>>> f1407acf5511e2148b2022858946c7d5d67ab551
 
 shinyServer(
   function(input, output, session) {
@@ -24,7 +33,11 @@ shinyServer(
       tab.full = data.frame(session_id   = session_id,
                             surv_id = 0,
                             comb_id = paste0(session_id, 0),
+<<<<<<< HEAD
                             user_id = "testid",
+=======
+                            user_id = 0,
+>>>>>>> f1407acf5511e2148b2022858946c7d5d67ab551
                             time   = time,
                             awake    = 0)
     )
@@ -42,16 +55,38 @@ shinyServer(
       current.pct <- round((current.participants / max.participants)*100)
       if(!(length(which(diff(attendance)<0))==0)){
       first.dropout <- ifelse(sum(diff(attendance) < 1) >0 , time[min(which(diff(attendance) < 0))], 0)
+      
+      # personal.tab <- data.frame(session_id = session_id, 
+      #                            surv_id = isolate(rv$surv_id), 
+      #                            comb_id = paste0(session_id, isolate(rv$surv_id)), 
+      #                            user_id = input$user_id, 
+      #                            time = in.time, 
+      #                            awake = 1)
+      
       } else first.dropout <- NA
+<<<<<<< HEAD
       personal.tab <- data.frame(session_id = session_id, surv_id = isolate(rv$surv_id), comb_id = paste0(session_id, isolate(rv$surv_id)), user_id = input$user_id, time = in.time, awake = 1)
+=======
+      personal.tab <- data.frame(session_id = session_id, 
+                                 surv_id = isolate(rv$surv_id), 
+                                 comb_id = paste0(session_id, isolate(rv$surv_id)), 
+                                 user_id =input$user_id, 
+                                 time = in.time, 
+                                 awake = 1)      
+>>>>>>> f1407acf5511e2148b2022858946c7d5d67ab551
       rv$tab.full <<- rbind(rv$tab.full, personal.tab)
-      tab.everyone <<- rbind(tab.everyone, rv$tab.full)
+      tab.everyone <<- rbind(tab.everyone, personal.tab)
+      # tab.everyone <<- rv$tab.everyone
       
       tab <- data.frame(rbind(max.participants,current.participants,current.pct,first.dropout),
                         row.names = c("Maximum N","Current N", "Current percent", "Time of first dropout"))
       colnames(tab) <- " "
       tab <<- tab
+<<<<<<< HEAD
       output$tab <- renderTable(tab)
+=======
+      output$tab <- renderTable(tab, rownames = T)
+>>>>>>> f1407acf5511e2148b2022858946c7d5d67ab551
       output$tab.full <- renderTable(rv$tab.full[min(which(rv$tab.full$surv_id ==1)):nrow(rv$tab.full),4:6])
       
     })
@@ -72,17 +107,36 @@ shinyServer(
       max.participants <- max(attendance)
       current.participants <- tail(attendance,1)
       current.pct <- round((current.participants / max.participants)*100)
-      first.dropout <- ifelse(sum(diff(attendance) < 1) >0 , time[min(which(diff(attendance) < 0))], 0)
+      if(!(length(which(diff(attendance)<0))==0)){
+        first.dropout <- ifelse(sum(diff(attendance) < 1) >0 , time[min(which(diff(attendance) < 0))], 0)
+      } else first.dropout <- NA  
       
+      
+      personal.tab <- data.frame(session_id = session_id, 
+                                 surv_id = isolate(rv$surv_id), 
+                                 comb_id = paste0(session_id, isolate(rv$surv_id)), 
+                                 user_id =input$user_id, 
+                                 time = out.time, 
+                                 awake = 0)
+      
+      
+<<<<<<< HEAD
       personal.tab <- data.frame(session_id = session_id, surv_id = isolate(rv$surv_id), comb_id = paste0(session_id, isolate(rv$surv_id)), user_id =input$user_id, time = out.time, awake = 0)
+=======
+>>>>>>> f1407acf5511e2148b2022858946c7d5d67ab551
       rv$tab.full <<- rbind(rv$tab.full, personal.tab)
-      tab.everyone <<- rbind(tab.everyone, rv$tab.full)
+      tab.everyone <<- rbind(tab.everyone, personal.tab)
+      # tab.everyone <<- rv$tab.everyone
       
       tab <- data.frame(rbind(max.participants,current.participants,current.pct,first.dropout),
                         row.names = c("Maximum N","Current N", "Current percent", "Time of first dropout"))
       colnames(tab) <- " "
       tab <<- tab
+<<<<<<< HEAD
       output$tab <- renderTable(tab)
+=======
+      output$tab <- renderTable(tab, rownames = T)
+>>>>>>> f1407acf5511e2148b2022858946c7d5d67ab551
       output$tab.full <- renderTable(rv$tab.full[min(which(rv$tab.full$surv_id ==1)):nrow(rv$tab.full),4:6])
     })
     
@@ -92,31 +146,58 @@ shinyServer(
       attendance <<- c(attendance, tail(attendance,1))
       time.stamp <<- ymd_hms(Sys.time())
       time <<- c(time, hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600)
-      plot(time, attendance, type = "s", xlim = c(min(time), max(time)+1/60))
+      plot(time, attendance, type = "s", xlim = c(min(time), max(time)+1/120), xlab = "hour (24)", ylab = "cognitive attendance")
       max.participants <- max(attendance)
       current.participants <- tail(attendance,1)
       current.pct <- round((current.participants / max.participants)*100)
       if(!(length(which(diff(attendance)<0))==0)){
-      first.dropout <- ifelse(sum(diff(attendance) < 1) >0 , time[min(which(diff(attendance) < 0))], 0)
-      } else first.dropout <- NA
+        first.dropout <- ifelse(sum(diff(attendance) < 1) >0 , time[min(which(diff(attendance) < 0))], 0)
+      } else first.dropout <- NA  
+      
       tab <- data.frame(rbind(max.participants,current.participants,current.pct,first.dropout), 
                         row.names = c("Maximum N","Current N", "Current percent", "Time of first dropout"))
       colnames(tab) <- " "
       tab <<- tab
-      output$tab <- renderTable(tab)
+      output$tab <- renderTable(tab, rownames = T)
       
     })
   
     output$downloadData <- downloadHandler(
       filename = function() { 
-        # paste(input$dataset, '.csv', sep='')
         paste0("seminarInfo_", Sys.Date(), ".csv")
       },
       content = function(file) {
+        write.csv(tab.everyone[!duplicated(tab.everyone[,c("comb_id", "surv_id", "awake")]),], file, row.names = F)
         tab.everyone <-tab.everyone[!duplicated(tab.everyone[,c(1,2,3,5)]),]
         write.csv(tab.everyone, file)
       }
     )
+    
+    observeEvent({
+      input$decrement
+      input$increment
+      },{
+      output$kmPlot <- renderPlot({
+        if(sum(tab.everyone$awake == 0) > 0){
+          censor.time.stamp <- ymd_hms(Sys.time())
+          censor.time <- hour(censor.time.stamp) + minute(censor.time.stamp)/60 + second(censor.time.stamp)/3600
+          tab.everyone.sub = tab.everyone[!duplicated(tab.everyone[,c("comb_id", "surv_id", "awake")]),]
+          tab.everyone.sub$comb_id <- paste0(tab.everyone.sub$session_id, tab.everyone.sub$surv_id)
+          tab.everyone.sub <- reshape(tab.everyone.sub, timevar = "awake", idvar = "comb_id", direction = "wide", v.names = c("time"))
+          tab.everyone.sub$event <- 1*!is.na(tab.everyone.sub$time.0)
+          tab.everyone.sub[is.na(tab.everyone.sub$time.0), "time.0"] <- censor.time
+          tab.everyone.sub$time.dif = (tab.everyone.sub$time.0 - tab.everyone.sub$time.1)*60 # convert back to minutes
+          
+          KM <- survfit(Surv(time.dif, event) ~ 1,  type="kaplan-meier", conf.type="log", data=tab.everyone.sub)
+          plot(KM, main = "Kaplan-Meier Survival Plot", xlab = "Minutes", ylab = "Survial") 
+        }
+      })
+      })
+    
+    # output$value <- renderText({ input$caption })
+    
+    # tab.everyone <- read.csv("~/Desktop/seminarInfo_2017-02-07.csv")
+    
     
   }
 )

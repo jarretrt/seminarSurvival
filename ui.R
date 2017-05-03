@@ -6,7 +6,7 @@ library(lubridate)
 
 attendance = 0
 time.stamp = ymd_hms(Sys.time())
-time = minute(time.stamp) + second(time.stamp)/60
+time = hour(time.stamp) + minute(time.stamp)/60 + second(time.stamp)/3600
 start.time = paste0(hour(time.stamp),":",minute(time.stamp))
 
 shinyUI(
@@ -32,10 +32,12 @@ shinyUI(
               mainPanel(
                 # alternates: "Boring conversation anyway."
                 # uiOutput("count"),
+                # textAreaInput("caption", "Caption", "", width = "500px"),
                 tableOutput('tab'),
                 plotOutput("timePlot"),
-                tableOutput('tab.full')
-                # tableOutput('tab.everyone')
+                verbatimTextOutput("value"),
+                tableOutput('tab.full'),
+                plotOutput("kmPlot")
                 )
             )
   )
